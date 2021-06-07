@@ -15,11 +15,11 @@ contract TokenCalculator {
     int256 private _result;
     uint256 private _price = 1;
 
-    event Add(address indexed user, int256 nb1, int256 nb2, int256 _result);
-    event Sub(address indexed user, int256 nb1, int256 nb2, int256 _result);
-    event Mul(address indexed user, int256 nb1, int256 nb2, int256 _result);
-    event Div(address indexed user, int256 nb1, int256 nb2, int256 _result);
-    event Mod(address indexed user, int256 nb1, int256 nb2, int256 _result);
+    event Add(int256 nb1, int256 nb2, int256 _result);
+    event Sub(int256 nb1, int256 nb2, int256 _result);
+    event Mul(int256 nb1, int256 nb2, int256 _result);
+    event Div(int256 nb1, int256 nb2, int256 _result);
+    event Mod(int256 nb1, int256 nb2, int256 _result);
     event Bought(address indexed sender, uint256 nbTokens);
     event Withdrew(address indexed sender, uint256 tokensAmount);
 
@@ -39,11 +39,6 @@ contract TokenCalculator {
         _;
     }
 
-    function _calculatorTokenCredit(address sender) private Credited {
-        _dsToken.transferFrom(sender, address(this), _price);
-        emit Bought(sender, _price);
-    }
-
     function withdrawTokens() public {
         require(msg.sender == _tokenOwner, "TokenCalculator: Only tokensOwner can withdraw profit");
         require(address(this).balance != 0, "TokenCalculator: No profit to withdraw");
@@ -52,25 +47,25 @@ contract TokenCalculator {
         emit Withdrew(msg.sender, tokensAmount);
     }
 
-    function add(int256 nb1, int256 nb2) public returns (int256) {
+    function add(int256 nb1, int256 nb2) public Credited returns (int256) {
         console.log(msg.sender, "msg.sender");
         _result = nb1 + nb2;
         _calculatorTokenCredit(msg.sender);
-        emit Add(msg.sender, nb1, nb2, _result);
+        emit Add(nb1, nb2, _result);
         return _result;
     }
 
     function sub(int256 nb1, int256 nb2) public Credited returns (int256) {
         _result = nb1 - nb2;
         _calculatorTokenCredit(msg.sender);
-        emit Sub(msg.sender, nb1, nb2, _result);
+        emit Sub(nb1, nb2, _result);
         return _result;
     }
 
     function mul(int256 nb1, int256 nb2) public Credited returns (int256) {
         _result = nb1 * nb2;
         _calculatorTokenCredit(msg.sender);
-        emit Mul(msg.sender, nb1, nb2, _result);
+        emit Mul(nb1, nb2, _result);
         return _result;
     }
 
@@ -78,7 +73,7 @@ contract TokenCalculator {
         require(nb2 != 0, "TokenCalculator: Can not divide by 0");
         _result = nb1 / nb2;
         _calculatorTokenCredit(msg.sender);
-        emit Div(msg.sender, nb1, nb2, _result);
+        emit Div(nb1, nb2, _result);
         return _result;
     }
 
@@ -86,11 +81,16 @@ contract TokenCalculator {
         require(nb2 != 0, "TokenCalculator: Can not divide by 0");
         _result = nb1 % nb2;
         _calculatorTokenCredit(msg.sender);
-        emit Mod(msg.sender, nb1, nb2, _result);
+        emit Mod(nb1, nb2, _result);
         return _result;
     }
 
     function calculatorProfit() public view returns (uint256) {
         return address(this).balance;
+    }
+
+    function _calculatorTokenCredit(address sender) private Credited {
+        _dsToken.transferFrom(sender, address(this), _price);
+        emit Bought(sender, _price);
     }
 }
