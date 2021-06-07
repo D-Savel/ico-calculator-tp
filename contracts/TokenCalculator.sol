@@ -3,7 +3,6 @@
 pragma solidity ^0.8.0;
 
 import "./DsToken.sol";
-import "hardhat/console.sol";
 
 contract TokenCalculator {
     /// @dev ERC20 token contract choose for TokenCalculator
@@ -48,7 +47,6 @@ contract TokenCalculator {
     }
 
     function add(int256 nb1, int256 nb2) public Credited returns (int256) {
-        console.log(msg.sender, "msg.sender");
         _result = nb1 + nb2;
         _calculatorTokenCredit(msg.sender);
         emit Add(nb1, nb2, _result);
