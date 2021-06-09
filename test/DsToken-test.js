@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-undef */
 const { expect } = require('chai');
 
